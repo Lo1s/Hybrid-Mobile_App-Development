@@ -222,7 +222,10 @@ angular.module('conFusion.controllers', [])
         };
     }])
 
-    .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 'baseURL', function($scope, $stateParams, menuFactory, baseURL) {
+    .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory',
+                                         'favoriteFactory', 'baseURL','$ionicPopover',
+                                         '$ionicModal', function($scope, $stateParams, menuFactory, favoriteFactory, baseURL, $ionicPopover,
+                                                                 $ionicModal) {
 
         $scope.baseURL = baseURL;
         $scope.dish = {};
@@ -239,7 +242,61 @@ angular.module('conFusion.controllers', [])
                 $scope.message = "Error: "+response.status + " " + response.statusText;
             }
         );
+        
+        $scope.popover = $ionicPopover.fromTemplateUrl('templates/dish-detail-popover.html', {
+            scope: $scope
+        }).then(function(popover) {
+            $scope.popover = popover;
+        });
+                                             
+        $scope.openPopover = function($event) {
+            $scope.popover.show($event);
+        }
 
+        $scope.closePopover = function() {
+            $scope.popover.hide();
+        }
+        
+        $scope.addToFavorites = function(id) {
+            console.log(id);
+            favoriteFactory.addToFavorites(id);
+        }
+        
+        // Create the reserve modal that we will use later
+        $ionicModal.fromTemplateUrl('templates/dish-comment.html', {
+            scope: $scope
+        }).then(function(modal) {
+            $scope.commentForm = modal;
+        });
+    
+        // Triggered in the reserve modal to close it
+        $scope.closeComment = function() {
+            $scope.commentForm.hide();
+        };
+        
+        $scope.addComment = function(index) {
+            // Open the reserve modal
+            $scope.comment = {
+                rating: 4,
+                comment: "",
+                author: "",
+                date: ""
+            }
+            
+            $scope.commentForm.show();
+            
+            $scope.doComment = function(index) {
+                console.log($scope.comment);
+                for (var i = 0; i < $scope.dish.comments.length; i++) {
+                    if ($scope.comment === $scope.dish.comments[i]) {
+                        console.log("Comment already added !")
+                        return;
+                    }
+                }
+                $scope.dish.comments.push($scope.comment);
+                $scope.commentForm.hide();
+            }
+        }
 
     }])
 

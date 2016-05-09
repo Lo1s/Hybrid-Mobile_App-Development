@@ -80,9 +80,11 @@ angular.module('conFusion.services',['ngResource'])
             var favorites = [];
             
             favFac.addToFavorites = function(index) {
-                for (var i = 1; i < favorites.length; i++) {
-                    if (favorites[i].id == index)
+                for (var i = 0; i < favorites.length; i++) {
+                    if (favorites[i].id == index) {
+                        console.log('Already in favorites');
                         return;
+                    }
                 }
                 favorites.push({id: index});
             };
